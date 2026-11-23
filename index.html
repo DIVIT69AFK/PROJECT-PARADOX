@@ -112,6 +112,30 @@ header:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;
 @media(hover:none){button:hover{transform:none;filter:none;box-shadow:none}button:hover::after{opacity:0;animation:none}button:active{transform:scale(.97);filter:brightness(1.2);box-shadow:0 0 16px #63f4ff77}button:active::after{opacity:1}}
 @media(prefers-reduced-motion:reduce){button,button::after{transition:none!important;animation:none!important}}
 
+
+/* Full-screen anime-action inspired system boot */
+.loading-screen{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:22px;background:radial-gradient(ellipse at 50% 38%,#18264c 0%,#090f20 48%,#050811 100%);opacity:0;visibility:hidden;transition:opacity .28s ease,visibility .28s ease;overflow:hidden}
+.loading-screen.show{opacity:1;visibility:visible}
+.loading-screen:before,.loading-screen:after{content:"";position:absolute;inset:-30%;pointer-events:none}
+.loading-screen:before{background:repeating-linear-gradient(112deg,transparent 0 70px,#63f4ff0b 71px 73px,transparent 74px 145px);transform:translateX(-30%);animation:bootSweep 4s linear infinite}
+.loading-screen:after{inset:0;background:linear-gradient(transparent 49.7%,#63f4ff0c 50%,transparent 50.3%);background-size:100% 7px;opacity:.35}
+.loading-frame{position:relative;width:min(520px,100%);padding:clamp(25px,6vw,48px);border:1px solid #49658a;background:linear-gradient(145deg,#101a30ed,#080e1dec);box-shadow:0 0 0 1px #63f4ff12,0 0 38px #63f4ff1a,0 28px 90px #000a;text-align:center;clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px))}
+.loading-mark{width:54px;height:54px;margin:0 auto 20px;border:1px solid var(--cyan);display:grid;place-items:center;color:var(--cyan);font:900 32px 'Barlow Condensed';transform:rotate(45deg);box-shadow:0 0 22px #63f4ff55;animation:markPulse 1.8s ease-in-out infinite}
+.loading-eyebrow{font:10px 'DM Mono';letter-spacing:3px;color:var(--cyan)}
+.loading-title{margin:12px 0 5px;font:900 clamp(34px,8vw,58px)/.95 'Barlow Condensed';letter-spacing:2px;color:#eef5ff;text-shadow:0 0 22px #63f4ff22}
+.loading-title span{color:var(--cyan)}
+.loading-subtitle{font:10px 'DM Mono';letter-spacing:2px;color:#9caecc}
+.loading-quote{min-height:54px;display:grid;place-items:center;margin:30px 0 6px;padding:12px 10px;border-top:1px solid #334b6b;border-bottom:1px solid #334b6b;color:#e7efff;font:italic 17px/1.45 'Barlow Condensed';letter-spacing:.4px;animation:quoteReveal .55s ease both}
+.loading-quote-label{font:9px 'DM Mono';letter-spacing:1.8px;color:var(--violet)}
+.loading-track{height:4px;margin-top:30px;background:#1c2b46;overflow:hidden}
+.loading-fill{height:100%;width:35%;background:linear-gradient(90deg,var(--cyan),var(--violet),#fff);box-shadow:0 0 15px var(--cyan);animation:loadTravel 1.25s ease-in-out infinite}
+.loading-status{display:flex;justify-content:space-between;margin-top:10px;font:9px 'DM Mono';letter-spacing:1.4px;color:#9caecc}
+@keyframes bootSweep{to{transform:translateX(30%)}}
+@keyframes markPulse{50%{box-shadow:0 0 34px #63f4ff99;filter:brightness(1.4)}}
+@keyframes quoteReveal{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes loadTravel{0%{transform:translateX(-110%)}100%{transform:translateX(310%)}}
+@media(prefers-reduced-motion:reduce){.loading-screen:before,.loading-mark,.loading-quote,.loading-fill{animation:none!important}}
+
 </style>
 </head>
 <body>
@@ -133,11 +157,38 @@ header:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;
 </main><div id="toast"></div>
 <div class="modal" id="help"><div class="modal-box"><div class="eyebrow">FIELD MANUAL / 001</div><h2>HOW TO PLAY</h2><ul><li>On phones, use the on-screen directional pad. On computers, use <b>W A S D</b> or the arrow keys. You can only move through open corridors.</li><li>Find the gold key to unlock the green exit portal.</li><li>Use <b>Run BFS</b> or <b>Run A*</b> to watch a pathfinding algorithm solve the maze.</li><li>In Human vs Algorithm mode, race the solver to the exit. The solver follows a shortest valid route.</li><li>Press <b>P</b> or tap Pause to freeze the run. The challenge timer pauses too.</li><li>The minimap shows walls, your position, the key, exit and remaining shards.</li><li>Scoring: +10 per move, +100 for the key or each shard, and +250 for a maze clear.</li><li>Every fifth Challenge level is a CORE BREACH boss stage: collect every shard before the exit will unlock.</li><li>Press <b>R</b> or Restart Run to reset your position.</li></ul><p><b>BFS</b> explores equally in all directions. <b>A*</b> uses a distance estimate to guide its search. Both find a shortest path in this unweighted maze.</p><button class="btn btn-primary" id="closeHelp">GOT IT</button></div></div>
 <div class="modal" id="levelResults" role="dialog" aria-modal="true" aria-labelledby="levelResultTitle"><div class="modal-box level-modal-box"><div class="level-kicker" id="levelResultKicker">LEVEL COMPLETE</div><h2 id="levelResultTitle">SIMULATION CLEARED</h2><div class="level-grade" id="levelGrade">A</div><p class="level-summary" id="levelSummary">Strong run. Ready for the next maze?</p><div class="level-result-grid"><div class="level-result-stat"><small>TIME</small><strong id="resultTime">00:00</strong></div><div class="level-result-stat"><small>STEPS</small><strong id="resultSteps">0</strong></div><div class="level-result-stat"><small>LEVEL POINTS</small><strong id="resultPoints">0</strong></div></div><div class="level-actions"><button class="btn neon-btn primary" id="nextLevelBtn">NEXT LEVEL →</button><button class="btn neon-btn" id="endRunBtn">END RUN</button></div></div></div>
+
+<div class="loading-screen" id="loadingScreen" aria-live="polite" aria-label="Loading maze">
+  <div class="loading-frame">
+    <div class="loading-mark">P</div>
+    <div class="loading-eyebrow">PROJECT PARADOX // SYSTEM BOOT</div>
+    <div class="loading-title">ENTER THE <span>UNKNOWN</span></div>
+    <div class="loading-subtitle">GENERATING YOUR NEXT TRIAL</div>
+    <div class="loading-quote" id="loadingQuote">"A path appears when you decide to move."</div>
+    <div class="loading-quote-label" id="loadingQuoteLabel">FIELD NOTE // ORIGINAL LINE</div>
+    <div class="loading-track"><div class="loading-fill"></div></div>
+    <div class="loading-status"><span>CALCULATING ROUTES</span><span id="loadingPercent">0%</span></div>
+  </div>
+</div>
 </div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 const $=id=>document.getElementById(id);
 const canvas=$('world');
+
+let loadingToken=0;
+const loadingLines=[
+  "A path appears when you decide to move.",
+  "Even the longest night has a route toward dawn.",
+  "Power is not found. It is built, one choice at a time.",
+  "The maze changes. Your resolve does not.",
+  "Every dead end is data. Every step is progress.",
+  "A true challenger adapts before the world does.",
+  "The next breakthrough is one turn away."
+];
+function showLoadingScreen(){const screen=$('loadingScreen');if(!screen)return;const i=Math.floor(Math.random()*loadingLines.length);$('loadingQuote').textContent='“'+loadingLines[i]+'”';$('loadingQuoteLabel').textContent='FIELD NOTE // '+String(i+1).padStart(2,'0');$('loadingPercent').textContent='SYNCING';screen.classList.add('show')}
+function hideLoadingScreen(){const screen=$('loadingScreen');if(!screen)return;$('loadingPercent').textContent='100%';screen.classList.remove('show')}
+
 let scene,camera,renderer,maze=[],N=17,player={x:1,z:1},keyPos={x:1,z:1},exitPos={x:15,z:15},hasKey=false,steps=0,startedAt=0,timer=null,sector=0,route=[],objects=[],solverGhost=null,solverTimer=null,solving=false,gameOver=false,moveLock=false;
 let challengeActive=false,challengeLevel=1,challengeScore=0,challengeDeadline=0,gems=[],gemsFound=0,levelAdvanceTimer=null,runScore=0,paused=false,pauseStartedAt=0,challengeRunSaved=false,levelStartScore=0;
 let heldMoveTimer=null,heldDirection=null;
@@ -155,7 +206,7 @@ function bfs(start,goal){const q=[start],prev=new Map(),dist=new Map([[keyOf(sta
 function astar(start,goal){const open=[{...start,g:0,f:Math.abs(start.x-goal.x)+Math.abs(start.z-goal.z)}],came=new Map(),g=new Map([[keyOf(start),0]]),closed=new Set();let visited=0;while(open.length){open.sort((a,b)=>a.f-b.f);const cur=open.shift(),ck=keyOf(cur);if(closed.has(ck))continue;closed.add(ck);visited++;if(cur.x===goal.x&&cur.z===goal.z)return {path:reconstruct(came,start,goal),visited};for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]]){const v={x:cur.x+dx,z:cur.z+dz},vk=keyOf(v);if(!cell(v.x,v.z)||closed.has(vk))continue;const ng=g.get(ck)+1;if(ng<(g.get(vk)??Infinity)){g.set(vk,ng);came.set(vk,ck);open.push({...v,g:ng,f:ng+Math.abs(v.x-goal.x)+Math.abs(v.z-goal.z)})}}}return {path:[],visited}}
 function keyOf(p){return p.x+','+p.z}
 function reconstruct(prev,start,goal){let k=keyOf(goal),out=[];if(k!==keyOf(start)&&!prev.has(k))return out;while(k){const [x,z]=k.split(',').map(Number);out.push({x,z});if(k===keyOf(start))break;k=prev.get(k)}return out.reverse()}
-function randomOpen(exclude){const a=[];for(let z=1;z<N-1;z++)for(let x=1;x<N-1;x++)if(cell(x,z)&&!exclude.some(p=>p.x===x&&p.z===z))a.push({x,z});return a[Math.floor(Math.random()*a.length)]}
+function reachableCells(start,blocked){const q=[{x:start.x,z:start.z}],seen=new Set([keyOf(start)]);let head=0;while(head<q.length){const p=q[head++];for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]]){const v={x:p.x+dx,z:p.z+dz},k=keyOf(v);if(v.x===blocked?.x&&v.z===blocked?.z)continue;if(cell(v.x,v.z)&&!seen.has(k)){seen.add(k);q.push(v)}}}return q}function randomOpen(exclude,blocked=exitPos){const excluded=new Set(exclude.map(p=>keyOf(p)));const reachable=reachableCells(player,blocked).filter(p=>!excluded.has(keyOf(p)));return reachable.length?reachable[Math.floor(Math.random()*reachable.length)]:null}
 function buildWorld(){clearWorld();const floor=new THREE.Mesh(new THREE.PlaneGeometry(N,N),mats.floor);floor.rotation.x=-Math.PI/2;floor.position.set(N/2-.5,-.53,N/2-.5);floor.receiveShadow=true;add(floor);
 const wallGeo=new THREE.BoxGeometry(.96,1.15,.96);for(let z=0;z<N;z++)for(let x=0;x<N;x++)if(maze[z][x]){const w=new THREE.Mesh(wallGeo,mats.wall);w.position.set(x,0,z);w.castShadow=true;w.receiveShadow=true;add(w);const cap=new THREE.Mesh(new THREE.BoxGeometry(.98,.045,.98),mats.edge);cap.position.set(x,.6,z);add(cap)}
 const grid=new THREE.GridHelper(N,N,0x355078,0x20304c);grid.position.set(N/2-.5,-.51,N/2-.5);add(grid);
@@ -168,7 +219,8 @@ if(challengeActive&&challengeLevel%5===0){const bp=randomOpen([player,keyPos,exi
 camera.position.set(player.x+7,9,player.z+8);camera.lookAt(player.x,0,player.z);
 }
 let playerMesh,keyMesh,portalMesh,bossCoreMesh;
-function newGame(){stopSolver();clearInterval(timer);clearTimeout(levelAdvanceTimer);$('levelResults').classList.remove('open');levelStartScore=challengeScore;paused=false;pauseStartedAt=0;$('pauseOverlay').classList.remove('show');$('pauseBtn').textContent='Ⅱ PAUSE';gameOver=false;hasKey=false;steps=0;startedAt=0;if(!challengeActive)runScore=0;player={x:1,z:1};sector++;if(challengeActive){const dim=Math.min(31,15+challengeLevel*2);$('size').value=dim;$('sizeLabel').textContent=dim+' × '+dim;$('complexity').value=challengeLevel>=3?'dense':'standard';$('complexityLabel').textContent=$('complexity').value.toUpperCase()}generateMaze(Number($('size').value));exitPos={x:N-2,z:N-2};const mainPath=bfs(player,exitPos).path;keyPos=mainPath[Math.max(2,Math.floor(mainPath.length*.38))]||mainPath[1];if(keyPos.x===exitPos.x&&keyPos.z===exitPos.z)keyPos=mainPath[1];gems=[];gemsFound=0;bossCoreMesh=null;if(challengeActive){for(let i=0;i<Math.min(5,2+challengeLevel);i++){const p=randomOpen([player,keyPos,exitPos,...gems]);if(p)gems.push(p)}}$('bossPill').style.display=challengeActive&&challengeLevel%5===0?'block':'none';buildWorld();route=[];$('welcome').style.display='grid';$('sector').textContent=String(sector).padStart(3,'0');$('state').textContent='READY';$('steps').textContent='0';$('time').textContent='00:00';$('checked').textContent='0';$('pathLength').textContent=String(mainPath.length-1);$('best').textContent=localStorage.getItem('paradoxBest')||'—';$('wins').textContent=localStorage.getItem('paradoxWins')||'0';$('level').textContent=challengeActive?String(challengeLevel):'—';$('score').textContent=String(challengeActive?challengeScore:runScore);$('hudScore').textContent=String(challengeActive?challengeScore:runScore);$('hudLevel').textContent=challengeActive?String(challengeLevel).padStart(2,'0'):'01';$('hudTime').textContent=challengeActive?'01:30':'00:00';$('gems').textContent='0/'+gems.length;drawMiniMap();$('status').innerHTML=challengeActive?(challengeLevel%5===0?'BOSS LEVEL: <b>CORE BREACH</b><br>Collect every data shard, then take the key to the exit.':'CHALLENGE: <b>Level '+challengeLevel+'</b><br>Collect shards, find the key and reach the exit.'):'SYSTEM: <b>Maze generated</b><br>OBJECTIVE: Find the key. Unlock the exit.';toast('A new maze has been generated. Good luck.')}
+function buildNewGame(){stopSolver();clearInterval(timer);clearTimeout(levelAdvanceTimer);$('levelResults').classList.remove('open');levelStartScore=challengeScore;paused=false;pauseStartedAt=0;$('pauseOverlay').classList.remove('show');$('pauseBtn').textContent='Ⅱ PAUSE';gameOver=false;hasKey=false;steps=0;startedAt=0;if(!challengeActive)runScore=0;player={x:1,z:1};sector++;if(challengeActive){const dim=Math.min(31,15+challengeLevel*2);$('size').value=dim;$('sizeLabel').textContent=dim+' × '+dim;$('complexity').value=challengeLevel>=3?'dense':'standard';$('complexityLabel').textContent=$('complexity').value.toUpperCase()}generateMaze(Number($('size').value));exitPos={x:N-2,z:N-2};const mainPath=bfs(player,exitPos).path;if(mainPath.length<3)throw new Error('Maze validation failed: exit route unavailable');keyPos=mainPath[Math.max(1,Math.min(mainPath.length-2,Math.floor((mainPath.length-1)*.38)))];if(!cell(keyPos.x,keyPos.z)||keyPos.x===exitPos.x&&keyPos.z===exitPos.z)throw new Error('Maze validation failed: key tile blocked');const keyRoute=bfs(player,keyPos).path,exitRoute=bfs(keyPos,exitPos).path;if(!keyRoute.length||!exitRoute.length)throw new Error('Maze validation failed: key or exit unreachable');gems=[];gemsFound=0;bossCoreMesh=null;if(challengeActive){for(let i=0;i<Math.min(5,2+challengeLevel);i++){const p=randomOpen([player,keyPos,exitPos,...gems],exitPos);if(p)gems.push(p)}}$('bossPill').style.display=challengeActive&&challengeLevel%5===0?'block':'none';buildWorld();route=[];$('welcome').style.display='grid';$('sector').textContent=String(sector).padStart(3,'0');$('state').textContent='READY';$('steps').textContent='0';$('time').textContent='00:00';$('checked').textContent='0';$('pathLength').textContent=String(mainPath.length-1);$('best').textContent=localStorage.getItem('paradoxBest')||'—';$('wins').textContent=localStorage.getItem('paradoxWins')||'0';$('level').textContent=challengeActive?String(challengeLevel):'—';$('score').textContent=String(challengeActive?challengeScore:runScore);$('hudScore').textContent=String(challengeActive?challengeScore:runScore);$('hudLevel').textContent=challengeActive?String(challengeLevel).padStart(2,'0'):'01';$('hudTime').textContent=challengeActive?'01:30':'00:00';$('gems').textContent='0/'+gems.length;drawMiniMap();$('status').innerHTML=challengeActive?(challengeLevel%5===0?'BOSS LEVEL: <b>CORE BREACH</b><br>Collect every data shard, then take the key to the exit.':'CHALLENGE: <b>Level '+challengeLevel+'</b><br>Collect shards, find the key and reach the exit.'):'SYSTEM: <b>Maze generated</b><br>OBJECTIVE: Find the key. Unlock the exit.';toast('A new maze has been generated. Good luck.')}
+function newGame(){const token=++loadingToken;showLoadingScreen();requestAnimationFrame(()=>setTimeout(()=>{if(token!==loadingToken)return;try{buildNewGame()}catch(err){console.error(err);toast('Maze validation failed. Please generate another maze.')}finally{hideLoadingScreen()}},520))}
 function toast(s){const t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2300)}
 function updateStats(){if(paused)return; $('steps').textContent=steps;let display;if(challengeActive&&startedAt){const left=Math.max(0,challengeDeadline-Date.now());display=formatTime(left);if(left<=0)endChallenge();$('timerChip').classList.toggle('urgent',left<20000)}else{display=formatTime(startedAt?Date.now()-startedAt:0);$('timerChip').classList.remove('urgent')} $('time').textContent=display;$('hudTime').textContent=display;$('hudScore').textContent=String(challengeActive?challengeScore:runScore);}
 function formatTime(ms){const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
