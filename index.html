@@ -166,6 +166,14 @@ body[data-anime-theme] .loading-fill{background:linear-gradient(90deg,var(--cyan
 .loading-theme{display:inline-block;margin-top:18px;padding:7px 12px;border:1px solid var(--theme-glow);color:var(--cyan);font:10px 'DM Mono';letter-spacing:2px;text-transform:uppercase;background:#05081188;box-shadow:0 0 18px color-mix(in srgb,var(--theme-glow) 20%,transparent)}
 .loading-frame{width:min(650px,100%);min-height:390px;display:flex;flex-direction:column;justify-content:center}
 .loading-art{position:absolute;inset:0;pointer-events:none;opacity:.14;background:radial-gradient(ellipse at 15% 20%,var(--theme-glow),transparent 35%),linear-gradient(120deg,transparent 35%,var(--theme-glow) 35.2%,transparent 35.8%);mask-image:linear-gradient(90deg,#000,transparent 65%)}
+/* Actual character artwork rotates with the selected anime arc. */
+.loading-art{opacity:.34;mix-blend-mode:screen;background-position:center,right center;background-size:cover,auto 100%;background-repeat:no-repeat;transition:background-image .25s ease,opacity .25s ease}
+body[data-anime-theme="bleach"] .loading-art{background-image:linear-gradient(90deg,var(--bg) 0%,transparent 76%),url("https://ogre.natalie.mu/media/news/comic/2026/0215/BLEACH_SS_visual.jpg?imdensity=1&impolicy=lt&imwidth=849")}
+body[data-anime-theme="onepiece"] .loading-art{background-image:linear-gradient(90deg,var(--bg) 0%,transparent 76%),url("https://vnw-img-cdn.popsww.com/api/v2/containers/file2/cms_topic/thumbnail_title__5_-f84207b5755f-1631767050748-rQKzxt64.png?v=0")}
+body[data-anime-theme="blackclover"] .loading-art{background-image:linear-gradient(90deg,var(--bg) 0%,transparent 76%),url("https://vignette.wikia.nocookie.net/liberproeliis/images/6/62/39a89205395546caeb48b7181b241fed.png/revision/latest?cb=20191221054301&path-prefix=pt-br")}
+body[data-anime-theme="jjk"] .loading-art{background-image:linear-gradient(90deg,var(--bg) 0%,transparent 76%),url("https://image.news.livedoor.com/newsimage/stf/d/d/dd33a_1699_301882ff3d135a6d374ea66e2332a09e.jpg")}
+body[data-anime-theme="chainsawman"] .loading-art{background-image:linear-gradient(90deg,var(--bg) 0%,transparent 76%),url("https://press.moviewalker.jp/api/resizeimage/news/article/1254321/14295500?w=615")}
+
 
 </style>
 </head>
