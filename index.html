@@ -136,6 +136,37 @@ header:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;
 @keyframes loadTravel{0%{transform:translateX(-110%)}100%{transform:translateX(310%)}}
 @media(prefers-reduced-motion:reduce){.loading-screen:before,.loading-mark,.loading-quote,.loading-fill{animation:none!important}}
 
+
+/* Rotating anime-inspired visual systems */
+body{transition:background .35s ease,color .35s ease}
+body:after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.12;background:radial-gradient(ellipse at 88% 12%,var(--theme-glow),transparent 35%),linear-gradient(135deg,transparent 0 58%,var(--theme-glow) 58.2%,transparent 58.7%),repeating-linear-gradient(155deg,transparent 0 74px,#fff 75px,transparent 76px 150px);mix-blend-mode:screen}
+.app{z-index:1}
+:root{--theme-glow:#63f4ff;--theme-panel:#101629;--theme-border:#263451}
+body[data-anime-theme="bleach"]{--bg:#080b12;--panel:#111725;--line:#38465d;--cyan:#e8edf7;--violet:#a7b5ca;--muted:#9aa7ba;--white:#f5f7fb;--green:#a9e6d0;--red:#ff758d;--theme-glow:#d9e7ff}
+body[data-anime-theme="onepiece"]{--bg:#07111b;--panel:#102337;--line:#28516b;--cyan:#4ddcff;--violet:#ffb65c;--muted:#9ab8cb;--white:#effaff;--green:#8cffc8;--red:#ff718f;--theme-glow:#ff9d42}
+body[data-anime-theme="blackclover"]{--bg:#0c0b14;--panel:#1a1426;--line:#49345f;--cyan:#bd8cff;--violet:#62e6d4;--muted:#b3a5c7;--white:#f7f0ff;--green:#7dffbd;--red:#ff718f;--theme-glow:#9a5cff}
+body[data-anime-theme="jjk"]{--bg:#090b18;--panel:#15182c;--line:#383d70;--cyan:#a58cff;--violet:#5de6e0;--muted:#a2a8c9;--white:#f1f2ff;--green:#86f5c6;--red:#ff718f;--theme-glow:#725cff}
+body[data-anime-theme="chainsawman"]{--bg:#130b0b;--panel:#241313;--line:#67302e;--cyan:#ff765f;--violet:#ffbd67;--muted:#c2a19a;--white:#fff2ed;--green:#a4e7a8;--red:#ff536b;--theme-glow:#ff4f37}
+body[data-anime-theme="bleach"] .stage{background:radial-gradient(ellipse at 50% 40%,#28354b,#070a12 72%)}
+body[data-anime-theme="onepiece"] .stage{background:radial-gradient(ellipse at 50% 40%,#16405a,#07111b 72%)}
+body[data-anime-theme="blackclover"] .stage{background:radial-gradient(ellipse at 50% 40%,#352047,#0c0b14 72%)}
+body[data-anime-theme="jjk"] .stage{background:radial-gradient(ellipse at 50% 40%,#292650,#090b18 72%)}
+body[data-anime-theme="chainsawman"] .stage{background:radial-gradient(ellipse at 50% 40%,#51221e,#130b0b 72%)}
+body[data-anime-theme] header{background:color-mix(in srgb,var(--bg) 88%,transparent);border-color:var(--line)}
+body[data-anime-theme] .panel{background:linear-gradient(155deg,color-mix(in srgb,var(--panel) 96%,white 4%),color-mix(in srgb,var(--bg) 94%,var(--theme-glow) 6%));border-color:var(--line)}
+body[data-anime-theme] .stat,body[data-anime-theme] .level-result-stat{background:color-mix(in srgb,var(--bg) 88%,var(--theme-glow) 12%);border-color:var(--line)}
+body[data-anime-theme] button,body[data-anime-theme] select{border-color:var(--line)}
+body[data-anime-theme] .btn-primary{background:linear-gradient(105deg,var(--cyan),var(--violet));box-shadow:0 5px 28px color-mix(in srgb,var(--theme-glow) 25%,transparent)}
+body[data-anime-theme] .loading-screen{background:radial-gradient(ellipse at 50% 35%,color-mix(in srgb,var(--theme-glow) 30%,var(--bg)),var(--bg) 70%)}
+body[data-anime-theme] .loading-frame{border-color:var(--theme-glow);box-shadow:0 0 0 1px color-mix(in srgb,var(--theme-glow) 20%,transparent),0 0 50px color-mix(in srgb,var(--theme-glow) 24%,transparent),0 28px 90px #000b}
+body[data-anime-theme] .loading-mark{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 25px color-mix(in srgb,var(--theme-glow) 55%,transparent)}
+body[data-anime-theme] .loading-quote-label{color:var(--violet)}
+body[data-anime-theme] .loading-track{background:color-mix(in srgb,var(--theme-glow) 16%,#101629)}
+body[data-anime-theme] .loading-fill{background:linear-gradient(90deg,var(--cyan),var(--violet),#fff);box-shadow:0 0 15px var(--theme-glow)}
+.loading-theme{display:inline-block;margin-top:18px;padding:7px 12px;border:1px solid var(--theme-glow);color:var(--cyan);font:10px 'DM Mono';letter-spacing:2px;text-transform:uppercase;background:#05081188;box-shadow:0 0 18px color-mix(in srgb,var(--theme-glow) 20%,transparent)}
+.loading-frame{width:min(650px,100%);min-height:390px;display:flex;flex-direction:column;justify-content:center}
+.loading-art{position:absolute;inset:0;pointer-events:none;opacity:.14;background:radial-gradient(ellipse at 15% 20%,var(--theme-glow),transparent 35%),linear-gradient(120deg,transparent 35%,var(--theme-glow) 35.2%,transparent 35.8%);mask-image:linear-gradient(90deg,#000,transparent 65%)}
+
 </style>
 </head>
 <body>
@@ -159,11 +190,11 @@ header:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;
 <div class="modal" id="levelResults" role="dialog" aria-modal="true" aria-labelledby="levelResultTitle"><div class="modal-box level-modal-box"><div class="level-kicker" id="levelResultKicker">LEVEL COMPLETE</div><h2 id="levelResultTitle">SIMULATION CLEARED</h2><div class="level-grade" id="levelGrade">A</div><p class="level-summary" id="levelSummary">Strong run. Ready for the next maze?</p><div class="level-result-grid"><div class="level-result-stat"><small>TIME</small><strong id="resultTime">00:00</strong></div><div class="level-result-stat"><small>STEPS</small><strong id="resultSteps">0</strong></div><div class="level-result-stat"><small>LEVEL POINTS</small><strong id="resultPoints">0</strong></div></div><div class="level-actions"><button class="btn neon-btn primary" id="nextLevelBtn">NEXT LEVEL →</button><button class="btn neon-btn" id="endRunBtn">END RUN</button></div></div></div>
 
 <div class="loading-screen" id="loadingScreen" aria-live="polite" aria-label="Loading maze">
-  <div class="loading-frame">
+  <div class="loading-frame"><div class="loading-art"></div>
     <div class="loading-mark">P</div>
     <div class="loading-eyebrow">PROJECT PARADOX // SYSTEM BOOT</div>
     <div class="loading-title">ENTER THE <span>UNKNOWN</span></div>
-    <div class="loading-subtitle">GENERATING YOUR NEXT TRIAL</div>
+    <div class="loading-subtitle">GENERATING YOUR NEXT TRIAL</div><div class="loading-theme" id="loadingTheme">ANIME ARC // RANDOMIZED</div>
     <div class="loading-quote" id="loadingQuote">"A path appears when you decide to move."</div>
     <div class="loading-quote-label" id="loadingQuoteLabel">FIELD NOTE // ORIGINAL LINE</div>
     <div class="loading-track"><div class="loading-fill"></div></div>
@@ -177,16 +208,16 @@ const $=id=>document.getElementById(id);
 const canvas=$('world');
 
 let loadingToken=0;
-const loadingLines=[
-  "A path appears when you decide to move.",
-  "Even the longest night has a route toward dawn.",
-  "Power is not found. It is built, one choice at a time.",
-  "The maze changes. Your resolve does not.",
-  "Every dead end is data. Every step is progress.",
-  "A true challenger adapts before the world does.",
-  "The next breakthrough is one turn away."
+const animeArcs=[
+ {id:"bleach",name:"BLEACH // SOUL REAPER ARC",quotes:["A blade is only as steady as the resolve behind it.","When the world turns silent, let your will speak.","Every battle begins long before the first strike."]},
+ {id:"onepiece",name:"ONE PIECE // GRAND LINE ARC",quotes:["The horizon belongs to those who keep moving.","A crew is built by the promises it refuses to abandon.","The next island is never found by standing still."]},
+ {id:"blackclover",name:"BLACK CLOVER // GRIMOIRE ARC",quotes:["No spell replaces the work you put in.","Even without a shortcut, keep pushing past your limit.","A quiet beginning can still lead to an impossible victory."]},
+ {id:"jjk",name:"JUJUTSU KAISEN // CURSED ENERGY ARC",quotes:["Control the chaos before it controls the field.","Pressure reveals the shape of your decisions.","The strongest move is the one you understand."]},
+ {id:"chainsawman",name:"CHAINSAW MAN // DEVIL HUNTER ARC",quotes:["Survive the unexpected. Adapt to the next turn.","A messy path can still lead somewhere worth reaching.","Keep your focus when the world gets loud."]}
 ];
-function showLoadingScreen(){const screen=$('loadingScreen');if(!screen)return;const i=Math.floor(Math.random()*loadingLines.length);$('loadingQuote').textContent='“'+loadingLines[i]+'”';$('loadingQuoteLabel').textContent='FIELD NOTE // '+String(i+1).padStart(2,'0');$('loadingPercent').textContent='SYNCING';screen.classList.add('show')}
+let loadingToken=0,lastAnimeArc=-1;
+function chooseAnimeArc(){let i=Math.floor(Math.random()*animeArcs.length);if(animeArcs.length>1&&i===lastAnimeArc)i=(i+1+Math.floor(Math.random()*(animeArcs.length-1)))%animeArcs.length;lastAnimeArc=i;return animeArcs[i]}
+function showLoadingScreen(){const screen=$('loadingScreen');if(!screen)return;const arc=chooseAnimeArc(),q=arc.quotes[Math.floor(Math.random()*arc.quotes.length)];document.body.dataset.animeTheme=arc.id;$('loadingQuote').textContent='“'+q+'”';$('loadingQuoteLabel').textContent='FIELD NOTE // '+arc.name;$('loadingTheme').textContent=arc.name;$('loadingPercent').textContent='SYNCING';screen.classList.add('show')}
 function hideLoadingScreen(){const screen=$('loadingScreen');if(!screen)return;$('loadingPercent').textContent='100%';screen.classList.remove('show')}
 
 let scene,camera,renderer,maze=[],N=17,player={x:1,z:1},keyPos={x:1,z:1},exitPos={x:15,z:15},hasKey=false,steps=0,startedAt=0,timer=null,sector=0,route=[],objects=[],solverGhost=null,solverTimer=null,solving=false,gameOver=false,moveLock=false;
