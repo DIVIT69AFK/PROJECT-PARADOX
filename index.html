@@ -51,8 +51,8 @@ main{min-height:0;display:flex;flex-direction:column;padding:8px;gap:9px;overflo
 .stage-top #pauseBtn{font-size:8px;padding:6px 7px}
 .hud{top:48px;right:7px;gap:4px}.hud-chip{min-width:55px;padding:5px 6px}
 .hud-chip small{font-size:7px;letter-spacing:.7px}.hud-chip strong{font-size:16px}
-.stage-bottom{left:8px;right:8px;bottom:9px;gap:6px;align-items:end}
-.touch-pad{display:grid;position:relative;z-index:6;pointer-events:auto;touch-action:none;flex:0 0 126px;width:126px;height:126px;grid-template-columns:repeat(3,38px);grid-template-rows:repeat(3,38px);gap:4px}
+.stage-bottom{left:8px;right:8px;bottom:9px;gap:6px;align-items:end;pointer-events:auto;z-index:7}
+.touch-pad{display:grid;position:relative;z-index:8;pointer-events:auto;touch-action:none;-webkit-user-select:none;user-select:none;flex:0 0 126px;width:126px;height:126px;grid-template-columns:repeat(3,38px);grid-template-rows:repeat(3,38px);gap:4px}
 .touch-key{font-size:15px;border-radius:8px}
 .controls-hint{display:block;margin-left:auto;max-width:calc(100% - 132px);font-size:7px;line-height:1.5;padding:7px;text-align:right}
 #miniMap{width:88px;height:88px;right:8px;bottom:143px}
@@ -149,15 +149,34 @@ $('mode').addEventListener('change',()=>{$('modeLabel').textContent=$('mode').va
 function stopHeldMove(){if(heldMoveTimer){clearInterval(heldMoveTimer);heldMoveTimer=null}heldDirection=null}
 function startHeldMove(dx,dz){stopHeldMove();heldDirection={dx,dz};move(dx,dz);heldMoveTimer=setInterval(()=>{if(heldDirection&&!paused&&!gameOver)move(heldDirection.dx,heldDirection.dz)},145)}
 const touchButtons=document.querySelectorAll('.touch-key');
+let activeTouchId=null,lastTouchButton=null;
+function directionFromButton(btn){return btn?{dx:Number(btn.dataset.dx),dz:Number(btn.dataset.dz)}:null}
+function beginTouchControl(btn,touchId){if(!btn||paused||gameOver)return;activeTouchId=touchId;lastTouchButton=btn;const d=directionFromButton(btn);if(d)startHeldMove(d.dx,d.dz)}
+function endTouchControl(){activeTouchId=null;lastTouchButton=null;stopHeldMove()}
+document.addEventListener('touchstart',e=>{
+ const t=e.target;const btn=t&&t.closest?t.closest('.touch-key'):null;
+ if(!btn)return;
+ e.preventDefault();
+ const touch=e.changedTouches&&e.changedTouches[0];
+ beginTouchControl(btn,touch?touch.identifier:0);
+},{capture:true,passive:false});
+document.addEventListener('touchend',e=>{
+ if(activeTouchId===null)return;
+ const ended=Array.from(e.changedTouches||[]).some(t=>t.identifier===activeTouchId);
+ if(ended){e.preventDefault();endTouchControl()}
+},{capture:true,passive:false});
+document.addEventListener('touchcancel',endTouchControl,{capture:true});
 touchButtons.forEach(btn=>{
- btn.addEventListener('touchstart',e=>{e.preventDefault();startHeldMove(Number(btn.dataset.dx),Number(btn.dataset.dz))},{passive:false});
- btn.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;e.preventDefault();startHeldMove(Number(btn.dataset.dx),Number(btn.dataset.dz))});
+ btn.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;e.preventDefault();const d=directionFromButton(btn);if(d)startHeldMove(d.dx,d.dz)});
+ btn.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')stopHeldMove()});
+ btn.addEventListener('pointercancel',stopHeldMove);
+ btn.addEventListener('click',e=>{if(e.detail===0)return; if(e.pointerType==='touch')return;const d=directionFromButton(btn);if(d)move(d.dx,d.dz)});
  btn.addEventListener('contextmenu',e=>e.preventDefault());
 });
-window.addEventListener('touchend',e=>{if(heldDirection){e.preventDefault();stopHeldMove()}},{passive:false});
-window.addEventListener('touchcancel',stopHeldMove);
 window.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')stopHeldMove()});
-window.addEventListener('pointercancel',stopHeldMove);window.addEventListener('blur',stopHeldMove);document.addEventListener('visibilitychange',()=>{if(document.hidden)stopHeldMove()});
+window.addEventListener('pointercancel',stopHeldMove);
+window.addEventListener('blur',stopHeldMove);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopHeldMove()});
 function readHallOfFame(){try{const raw=localStorage.getItem('paradoxHall');const rows=raw?JSON.parse(raw):[];return Array.isArray(rows)?rows.filter(r=>r&&Number.isFinite(Number(r.score))&&Number.isFinite(Number(r.level))):[]}catch(e){return []}}
 function renderLeaderboard(){const rows=readHallOfFame().sort((a,b)=>Number(b.score)-Number(a.score)||Number(b.level)-Number(a.level)).slice(0,5);$('leaderboard').innerHTML=rows.length?rows.map((r,i)=>'<div class="hof-row"><span class="hof-rank">#'+(i+1)+'</span><span class="hof-level">LVL '+Number(r.level)+'</span><strong class="hof-score">'+Number(r.score).toLocaleString()+' PTS</strong></div>').join(''):'<div class="hof-empty">No saved runs yet.<br>Finish a Challenge run to enter the Hall of Fame.</div>'}
 function startChallenge(){stopHeldMove();challengeRunSaved=false;challengeActive=true;challengeLevel=1;challengeScore=0;$('challengeBtn').textContent='■ FINISH & SAVE SCORE';$('mode').value='challenge';$('modeLabel').textContent='PARADOX CHALLENGE';newGame();$('time').textContent='01:30';$('hudTime').textContent='01:30';$('hudScore').textContent='0';$('hudLevel').textContent='01';toast('Challenge started. Collect every shard!')}
