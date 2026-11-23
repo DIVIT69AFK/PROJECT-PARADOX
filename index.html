@@ -149,9 +149,9 @@ $('mode').addEventListener('change',()=>{$('modeLabel').textContent=$('mode').va
 function stopHeldMove(){if(heldMoveTimer){clearInterval(heldMoveTimer);heldMoveTimer=null}heldDirection=null}
 function startHeldMove(dx,dz){stopHeldMove();heldDirection={dx,dz};move(dx,dz);heldMoveTimer=setInterval(()=>{if(heldDirection&&!paused&&!gameOver)move(heldDirection.dx,heldDirection.dz)},145)}
 const touchButtons=document.querySelectorAll('.touch-key');
-let activeTouchId=null,lastTouchButton=null;
+let activeTouchId=null,lastTouchButton=null,lastControlStartAt=0;
 function directionFromButton(btn){return btn?{dx:Number(btn.dataset.dx),dz:Number(btn.dataset.dz)}:null}
-function beginTouchControl(btn,touchId){if(!btn||paused||gameOver)return;activeTouchId=touchId;lastTouchButton=btn;const d=directionFromButton(btn);if(d)startHeldMove(d.dx,d.dz)}
+function beginTouchControl(btn,touchId){if(!btn||paused||gameOver)return;lastControlStartAt=Date.now();activeTouchId=touchId;lastTouchButton=btn;const d=directionFromButton(btn);if(d)startHeldMove(d.dx,d.dz)}
 function endTouchControl(){activeTouchId=null;lastTouchButton=null;stopHeldMove()}
 document.addEventListener('touchstart',e=>{
  const t=e.target;const btn=t&&t.closest?t.closest('.touch-key'):null;
@@ -167,10 +167,10 @@ document.addEventListener('touchend',e=>{
 },{capture:true,passive:false});
 document.addEventListener('touchcancel',endTouchControl,{capture:true});
 touchButtons.forEach(btn=>{
- btn.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;e.preventDefault();const d=directionFromButton(btn);if(d)startHeldMove(d.dx,d.dz)});
+ btn.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;e.preventDefault();lastControlStartAt=Date.now();const d=directionFromButton(btn);if(d)startHeldMove(d.dx,d.dz)});
  btn.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')stopHeldMove()});
  btn.addEventListener('pointercancel',stopHeldMove);
- btn.addEventListener('click',e=>{if(e.detail===0)return; if(e.pointerType==='touch')return;const d=directionFromButton(btn);if(d)move(d.dx,d.dz)});
+ btn.addEventListener('click',e=>{if(Date.now()-lastControlStartAt<800)return;const d=directionFromButton(btn);if(d)move(d.dx,d.dz)});
  btn.addEventListener('contextmenu',e=>e.preventDefault());
 });
 window.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')stopHeldMove()});
