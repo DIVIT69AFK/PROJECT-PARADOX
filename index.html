@@ -301,7 +301,7 @@ function newGame(){const token=++loadingToken,video=$('loadingVideo');let finish
 function toast(s){const t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2300)}
 function updateStats(){if(paused)return;$('steps').textContent=steps;let display;if(challengeActive){const left=challengeDeadline?Math.max(0,challengeDeadline-Date.now()):challengeRemainingMs;display=formatTime(left);if(challengeDeadline&&left<=0){challengeRemainingMs=0;endChallenge()}$('timerChip').classList.toggle('urgent',left<20000)}else{display=formatTime(startedAt?Date.now()-startedAt:0);$('timerChip').classList.remove('urgent')}$('time').textContent=display;$('hudTime').textContent=display;$('hudScore').textContent=String(challengeActive?challengeScore:runScore);}
 function formatTime(ms){const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
-function addChallengeTime(ms){if(!challengeActive||ms<=0)return;if(challengeDeadline)challengeDeadline+=ms;else challengeRemainingMs+=ms;challengeRemainingMs+=challengeDeadline?ms:0;$('time').textContent=formatTime(challengeDeadline?Math.max(0,challengeDeadline-Date.now()):challengeRemainingMs);$('hudTime').textContent=$('time').textContent}
+function addChallengeTime(ms){if(!challengeActive||!ms)return;if(challengeDeadline)challengeDeadline=Math.max(Date.now(),challengeDeadline+ms);else challengeRemainingMs=Math.max(0,challengeRemainingMs+ms);challengeRemainingMs=challengeDeadline?Math.max(0,challengeDeadline-Date.now()):challengeRemainingMs;$('time').textContent=formatTime(challengeDeadline?Math.max(0,challengeDeadline-Date.now()):challengeRemainingMs);$('hudTime').textContent=$('time').textContent}
 function updatePowerInventory(){
  $('powerCount').textContent=inventory.length+' / 3';
  for(let i=0;i<3;i++){const b=$('powerSlot'+i),p=inventory[i];b.disabled=!p;b.classList.toggle('filled',!!p);b.style.setProperty('--power-color',p?powerDefs[p].color:'#63f4ff');b.innerHTML=p?'<span class="power-icon">'+powerDefs[p].icon+'</span><span class="power-name">'+powerDefs[p].name+'</span><span class="power-name">'+powerDefs[p].rarity+'</span>':'<span class="power-icon">＋</span><span class="power-name">EMPTY</span>'}
@@ -326,13 +326,14 @@ function activatePower(i){
  if(p==='magnet'){powerUntil.magnet=now+powerDefs[p].duration;for(const g of gems)if(!g.collected&&Math.abs(g.x-player.x)+Math.abs(g.z-player.z)<=2)collectShard(g);announcePower('SHARD MAGNET · ACTIVE',powerDefs[p].color)}
  if(p==='shield'){phaseShield++;announcePower('PHASE SHIELD · 1 HIT',powerDefs[p].color)}
  if(p==='pathfinder'){const goal=hasKey?exitPos:keyPos;showRoute((hasKey?bfs(player,goal):bfs(player,goal)).path);clearTimeout(routeRevealTimer);routeRevealTimer=setTimeout(()=>{route.forEach(o=>scene.remove(o));route=[]},powerDefs[p].duration);announcePower('PATHFINDER · ROUTE REVEALED',powerDefs[p].color)}
- if(p==='time'){if(challengeActive)addChallengeTime(15000);announcePower('TIME BURST · +15 SECONDS',powerDefs[p].color)}
- if(p==='nova'){if(challengeActive)addChallengeTime(20000);powerUntil.nova=now+powerDefs[p].duration;announcePower('NOVA CORE · DOUBLE POINTS',powerDefs[p].color)}
+ if(p==='time'){if(challengeActive){addChallengeTime(15000);announcePower('TIME BURST · +15 SECONDS',powerDefs[p].color)}else{addPoints(250);announcePower('TIME BURST · +250 POINTS',powerDefs[p].color)}}
+ if(p==='nova'){if(challengeActive)addChallengeTime(20000);else addPoints(500);powerUntil.nova=now+powerDefs[p].duration;announcePower(challengeActive?'NOVA CORE · +20 SECONDS · DOUBLE POINTS':'NOVA CORE · +500 POINTS · DOUBLE POINTS',powerDefs[p].color)}
 }
 function activateModifier(){
  activeModifier=$('modifierSelect').value;hazardCells=[];hazardMeshes.forEach(m=>scene.remove(m));hazardMeshes=[];
  if(scene&&scene.fog){scene.fog.near=activeModifier==='fog'?4:18;scene.fog.far=activeModifier==='fog'?20:48}
- if(activeModifier==='danger'||activeModifier==='shifting'){const p=randomOpen([player,keyPos,exitPos,...gems]);if(p)hazardCells=[p];hazardMoveAt=Date.now()+8000;renderHazards()}
+ if(activeModifier==='danger'||activeModifier==='shifting'){const p=randomOpen([player,keyPos,exitPos,...gems]);if(p)hazardCells=[p];hazardMoveAt=Date.now()+8000;}
+ renderHazards();
 }
 function renderHazards(){
  hazardMeshes.forEach(m=>scene.remove(m));hazardMeshes=[];
